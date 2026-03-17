@@ -1,0 +1,11 @@
+{
+  "id": "wibor-lawsuit",
+  "label": "Pozew WIBOR",
+  "description": "Przygotowanie pozwu — dane stron, WPS, oplaty sadowe, checklist dokumentow",
+  "version": "0.1.0",
+  "author": "obieg-zero",
+  "entry": "index.mjs",
+  "requires": ["wibor-calc"],
+  "tags": ["legal", "wibor", "lawsuit"],
+  "defaultSettings": {}
+}

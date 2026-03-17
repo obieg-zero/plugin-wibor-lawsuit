@@ -15,12 +15,12 @@ var EVIDENCE_ITEMS = [
 ];
 var plnFmt = new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PLN", minimumFractionDigits: 2, maximumFractionDigits: 2 });
 var formatPLN = (n) => plnFmt.format(n);
-var empty = () => ({ plaintiffName: "", plaintiffAddress: "", plaintiffPesel: "", courtName: "", demandDate: "", notes: "" });
+var EMPTY = { plaintiffName: "", plaintiffAddress: "", plaintiffPesel: "", courtName: "", demandDate: "", notes: "" };
 var _data = {};
 var _activeCaseId = null;
 var subs = /* @__PURE__ */ new Set();
 var emit = () => subs.forEach((fn) => fn());
-var getCurrent = () => _activeCaseId ? _data[_activeCaseId] ?? empty() : empty();
+var getCurrent = () => _activeCaseId ? _data[_activeCaseId] ?? EMPTY : EMPTY;
 var _host;
 var _sdk;
 function initStore(host, sdk) {
@@ -37,14 +37,14 @@ async function loadForCase(caseId) {
   if (_data[caseId]) return;
   const raw = await _host.db.getSetting(`wibor-lawsuit:${caseId}`);
   if (raw) try {
-    _data[caseId] = { ...empty(), ...JSON.parse(raw) };
+    _data[caseId] = { ...EMPTY, ...JSON.parse(raw) };
   } catch {
   }
   emit();
 }
 function saveField(field, value) {
   if (!_activeCaseId) return;
-  if (!_data[_activeCaseId]) _data[_activeCaseId] = empty();
+  if (!_data[_activeCaseId]) _data[_activeCaseId] = { ...EMPTY };
   _data[_activeCaseId] = { ..._data[_activeCaseId], [field]: value };
   emit();
   _host.db.setSetting(`wibor-lawsuit:${_activeCaseId}`, JSON.stringify(_data[_activeCaseId]));

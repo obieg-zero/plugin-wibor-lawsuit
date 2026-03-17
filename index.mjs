@@ -1,5 +1,7 @@
-const __R=globalThis.__obieg.React;const{useState,useEffect,useCallback,useRef,useMemo,useReducer,useContext,createContext,createElement,Fragment,memo,forwardRef,useLayoutEffect,useId,useSyncExternalStore,useTransition,Component}=__R;
-const __J=globalThis.__obieg.jsxRuntime;const{jsx,jsxs,Fragment:_Fragment}=__J;
+// mcp-plugin-dev/shims/react.mjs
+var R = globalThis.__obieg.React;
+var { useState, useEffect, useCallback, useRef, useMemo, useReducer, useContext, createContext, createElement, Fragment, memo, forwardRef, useLayoutEffect, useId, useSyncExternalStore, useTransition, Component } = R;
+
 // ../obieg-zero-plugins/wibor-lawsuit/src/store.ts
 var STATUTORY_RATE = 11.25;
 var EVIDENCE_ITEMS = [
@@ -70,6 +72,10 @@ function useSyncCase() {
   return calc;
 }
 
+// mcp-plugin-dev/shims/jsx-runtime.mjs
+var J = globalThis.__obieg.jsxRuntime;
+var { jsx, jsxs, Fragment: Fragment2 } = J;
+
 // ../obieg-zero-plugins/wibor-lawsuit/src/ui.tsx
 function createUI(ui, icons, sdk) {
   const { Box, Cell, Field } = ui;
@@ -85,7 +91,7 @@ function createUI(ui, icons, sdk) {
     const calc = useSyncCase();
     const s = useCurrentLawsuit();
     if (!calc?.caseId) return /* @__PURE__ */ jsx(Box, { header: /* @__PURE__ */ jsx(Cell, { label: true, children: "Pozew WIBOR" }), body: /* @__PURE__ */ jsx("div", { className: "text-xs text-base-content/40 text-center py-4", children: "Najpierw utworz sprawe w Kalkulatorze WIBOR" }) });
-    return /* @__PURE__ */ jsxs(Fragment, { children: [
+    return /* @__PURE__ */ jsxs(Fragment2, { children: [
       /* @__PURE__ */ jsx(Box, { header: /* @__PURE__ */ jsx(Cell, { label: true, children: "Dane powoda" }), body: /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
         /* @__PURE__ */ jsx(Field, { label: "Imie i nazwisko", children: /* @__PURE__ */ jsx("input", { value: s.plaintiffName, onChange: (e) => saveField("plaintiffName", e.target.value), className: inp, placeholder: "Jan Kowalski" }) }),
         /* @__PURE__ */ jsx(Field, { label: "Adres", children: /* @__PURE__ */ jsx("input", { value: s.plaintiffAddress, onChange: (e) => saveField("plaintiffAddress", e.target.value), className: inp, placeholder: "ul. Dluga 1, 00-001 Warszawa" }) }),

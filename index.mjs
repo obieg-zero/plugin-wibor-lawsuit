@@ -54,6 +54,15 @@ function useSyncCase() {
   const calcApi = _sdk.getProvider("wibor-calc");
   return calcApi?.useCalc() ?? null;
 }
+function useBanks() {
+  const api = _sdk.getProvider("wibor-banks");
+  return api?.useBanks() ?? [];
+}
+function useEvidenceStatus(caseId) {
+  const api = _sdk.getProvider("wibor-evidence");
+  if (!api || !caseId) return null;
+  return api.useEvidence(caseId);
+}
 function calcCourtFee(wps) {
   return Math.max(30, Math.min(Math.ceil(wps * 0.05), 2e5));
 }
@@ -74,16 +83,56 @@ function createUI(ui, icons, sdk) {
   const { Box, Cell, Field, Card, SummaryRow } = ui;
   const { Shield, Check, Circle } = icons;
   const inp = "input input-bordered input-sm w-full";
+  function EvidenceChecklist({ caseId }) {
+    const evidenceStatus = useEvidenceStatus(caseId);
+    return /* @__PURE__ */ jsx("div", { className: "space-y-3", children: EVIDENCE_ITEMS.map(([key, label]) => {
+      const status = evidenceStatus?.find((e) => e.type === key);
+      const uploaded = status?.uploaded ?? false;
+      return /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3 py-1", children: [
+        uploaded ? /* @__PURE__ */ jsx(Check, { size: 14, className: "text-success shrink-0" }) : /* @__PURE__ */ jsx(Circle, { size: 12, className: "text-base-content/20 shrink-0" }),
+        /* @__PURE__ */ jsx("span", { className: `text-sm ${uploaded ? "text-base-content/60" : "text-base-content/30"}`, children: label }),
+        uploaded && status?.count && /* @__PURE__ */ jsx("span", { className: "text-xs text-base-content/30 ml-auto", children: status.count })
+      ] }, key);
+    }) });
+  }
   function Left() {
     const calc = useSyncCase();
     const s = useCurrentLawsuit();
+    const banks = useBanks();
     const caseId = calc?.caseId;
     if (!caseId) return /* @__PURE__ */ jsx(Box, { header: /* @__PURE__ */ jsx(Cell, { label: true, children: "Pozew WIBOR" }), body: /* @__PURE__ */ jsx("div", { className: "text-xs text-base-content/40 text-center py-4", children: "Najpierw utw\xF3rz spraw\u0119 w Kalkulatorze WIBOR" }) });
+    const handleBankSelect = (bankId) => {
+      const bank = banks.find((b) => b.id === bankId);
+      if (bank) {
+        saveField(caseId, "defendantBank", bank.name);
+        saveField(caseId, "defendantKrs", bank.krs);
+        saveField(caseId, "defendantNip", bank.nip);
+        saveField(caseId, "defendantAddress", bank.address);
+      }
+    };
     return /* @__PURE__ */ jsxs(Fragment, { children: [
       /* @__PURE__ */ jsx(Box, { header: /* @__PURE__ */ jsx(Cell, { label: true, children: "Dane powoda" }), body: /* @__PURE__ */ jsxs("div", { className: "space-y-3", children: [
         /* @__PURE__ */ jsx(Field, { label: "Imi\u0119 i nazwisko", children: /* @__PURE__ */ jsx("input", { value: s.plaintiffName, onChange: (e) => saveField(caseId, "plaintiffName", e.target.value), className: inp, placeholder: "Jan Kowalski" }) }),
         /* @__PURE__ */ jsx(Field, { label: "Adres", children: /* @__PURE__ */ jsx("input", { value: s.plaintiffAddress, onChange: (e) => saveField(caseId, "plaintiffAddress", e.target.value), className: inp, placeholder: "ul. Dluga 1, 00-001 Warszawa" }) }),
         /* @__PURE__ */ jsx(Field, { label: "PESEL", children: /* @__PURE__ */ jsx("input", { value: s.plaintiffPesel, onChange: (e) => saveField(caseId, "plaintiffPesel", e.target.value), className: inp, placeholder: "12345678901", maxLength: 11 }) })
+      ] }) }),
+      banks.length > 0 && /* @__PURE__ */ jsx(Box, { header: /* @__PURE__ */ jsx(Cell, { label: true, children: "Pozwany (bank)" }), body: /* @__PURE__ */ jsxs("div", { className: "space-y-3", children: [
+        /* @__PURE__ */ jsx(Field, { label: "Wybierz bank", children: /* @__PURE__ */ jsxs("select", { onChange: (e) => handleBankSelect(e.target.value), className: "select select-bordered select-sm w-full", children: [
+          /* @__PURE__ */ jsx("option", { value: "", children: "-- wybierz --" }),
+          banks.map((b) => /* @__PURE__ */ jsx("option", { value: b.id, children: b.name }, b.id))
+        ] }) }),
+        s.defendantBank && /* @__PURE__ */ jsxs("div", { className: "text-xs text-base-content/60 space-y-1", children: [
+          /* @__PURE__ */ jsx("div", { className: "font-medium", children: s.defendantBank }),
+          s.defendantKrs && /* @__PURE__ */ jsxs("div", { children: [
+            "KRS: ",
+            s.defendantKrs
+          ] }),
+          s.defendantNip && /* @__PURE__ */ jsxs("div", { children: [
+            "NIP: ",
+            s.defendantNip
+          ] }),
+          s.defendantAddress && /* @__PURE__ */ jsx("div", { children: s.defendantAddress })
+        ] })
       ] }) }),
       /* @__PURE__ */ jsx(Box, { header: /* @__PURE__ */ jsx(Cell, { label: true, children: "Sad i wezwanie" }), body: /* @__PURE__ */ jsxs("div", { className: "space-y-3", children: [
         /* @__PURE__ */ jsx(Field, { label: "S\u0105d w\u0142a\u015Bciwy", children: /* @__PURE__ */ jsx("input", { value: s.courtName, onChange: (e) => saveField(caseId, "courtName", e.target.value), className: inp, placeholder: "S\u0105d Okr\u0119gowy w Warszawie" }) }),
@@ -155,10 +204,7 @@ function createUI(ui, icons, sdk) {
       ] }) }),
       /* @__PURE__ */ jsxs("div", { className: "rounded-xl border border-base-300 p-6", children: [
         /* @__PURE__ */ jsx("div", { className: "text-xs uppercase tracking-wider font-semibold text-base-content/40 mb-4", children: "Wymagane dokumenty" }),
-        /* @__PURE__ */ jsx("div", { className: "space-y-3", children: EVIDENCE_ITEMS.map(([key, label]) => /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3 py-1", children: [
-          /* @__PURE__ */ jsx(Circle, { size: 12, className: "text-base-content/20 shrink-0" }),
-          /* @__PURE__ */ jsx("span", { className: "text-sm text-base-content/50", children: label })
-        ] }, key)) })
+        /* @__PURE__ */ jsx(EvidenceChecklist, { caseId: calc.caseId })
       ] })
     ] });
   }

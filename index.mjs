@@ -11,7 +11,7 @@ var EVIDENCE_ITEMS = [
 ];
 var plnFmt = new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PLN", minimumFractionDigits: 2, maximumFractionDigits: 2 });
 var formatPLN = (n) => plnFmt.format(n);
-var EMPTY = { plaintiffName: "", plaintiffAddress: "", plaintiffPesel: "", courtName: "", demandDate: "", notes: "" };
+var EMPTY = { plaintiffName: "", plaintiffAddress: "", plaintiffPesel: "", defendantBank: "", defendantKrs: "", defendantNip: "", defendantAddress: "", courtName: "", demandDate: "", notes: "" };
 var _posts;
 var _sdk;
 var _host;
@@ -225,7 +225,7 @@ var plugin = (deps) => {
     label: "Pozew WIBOR",
     description: "Przygotowanie pozwu \u2014 dane stron, WPS, oplaty sadowe, checklist dokumentow",
     icon: Shield,
-    requires: ["wibor-calc"],
+    requires: ["wibor-calc", "wibor-banks", "wibor-evidence"],
     defaultEnabled: false,
     layout: { left: Left, center: Center, footer: Footer }
   };

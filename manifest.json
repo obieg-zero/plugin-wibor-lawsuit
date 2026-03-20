@@ -2,17 +2,19 @@
   "id": "wibor-lawsuit",
   "label": "Pozew WIBOR",
   "description": "Przygotowanie pozwu — dane stron, WPS, oplaty sadowe, checklist dokumentow",
-  "version": "0.1.12",
+  "version": "0.1.14",
   "author": "obieg-zero",
   "entry": "index.mjs",
   "requires": [
     "wibor-calc",
-    "wibor-banks"
+    "wibor-banks",
+    "wibor-evidence"
   ],
   "tags": [
     "legal",
     "wibor",
     "lawsuit"
   ],
-  "defaultSettings": {}
+  "defaultSettings": {},
+  "order": 6
 }
